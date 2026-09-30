@@ -62,9 +62,10 @@ const args = process.argv.slice(2);
 const APPLY = args.includes("--apply");
 const FORCE = args.includes("--force");
 const LIST = args.includes("--list");
+const HELP = args.includes("--help");
 const file = args.find((a) => !a.startsWith("--"));
 
-if (!KIMAI_URL || !KIMAI_TOKEN) {
+if ((!KIMAI_URL || !KIMAI_TOKEN) && !HELP) {
   console.error("Faltan KIMAI_URL y/o KIMAI_TOKEN en el entorno.");
   process.exit(1);
 }
@@ -128,7 +129,21 @@ async function listRefs() {
   }
 }
 
+function printHelp(){
+	console.log("\n=== COMANDOS ===\n")
+	
+	console.log("* node kimai-load.mjs --list | Verificar proyecto y actividades");
+	console.log("* node kimai-load.mjs notas.txt | Ejecutar un dry-run");
+	console.log("* node kimai-load.mjs notas.txt --apply | Cargar las horas");
+	console.log("* node kimai-load.mjs notas.txt --apply --force | Forzar la carga\n");
+	
+	console.log("\n=== Flags ===\n")
+	console.log("* node kimai-load.mjs --list | Verificar proyecto y actividades");
+	console.log("* node --env-file=.env kimai-load.mjs {Accion} | Pasar environment como archivo\n");
+
+}
 async function main() {
+  if (HELP) return printHelp();
   if (LIST) return listRefs();
   if (!file) {
     console.error("Indicá el archivo de notas. Ej: node kimai-load.mjs notas.txt");
