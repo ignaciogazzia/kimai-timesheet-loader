@@ -1,0 +1,19 @@
+31/08/2026 Lunes
+	• https://jazusoft.atlassian.net/browse/CP-742
+	• https://jazusoft.atlassian.net/browse/CP-749
+
+01/09/2026 Martes
+	• https://jazusoft.atlassian.net/browse/CP-738
+	• https://jazusoft.atlassian.net/browse/CP-749
+
+02/09/2026 Miercoles
+	• https://jazusoft.atlassian.net/browse/CP-749
+	• https://jazusoft.atlassian.net/browse/CP-842
+
+03/09/2026 Jueves
+	• https://jazusoft.atlassian.net/browse/CP-749
+	• https://jazusoft.atlassian.net/browse/CP-842
+
+04/09/2026 Viernes
+	• https://jazusoft.atlassian.net/browse/MC-573
+	• https://jazusoft.atlassian.net/browse/MC-675
