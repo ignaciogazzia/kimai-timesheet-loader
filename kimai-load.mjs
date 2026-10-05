@@ -13,7 +13,22 @@
 //   KIMAI_TOKEN  token/API key de tu perfil de Kimai
 //   KIMAI_LEGACY_HEADER=1  (opcional) usa el header X-AUTH-TOKEN en vez de Bearer
 
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+
+function loadEnvFile(path = ".env") {
+  if (!existsSync(path)) return;
+  for (const line of readFileSync(path, "utf8").split(/\r?\n/)) {
+    const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*?)\s*$/);
+    if (!match || match[1].startsWith("#")) continue;
+    let value = match[2];
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+    if (process.env[match[1]] === undefined) process.env[match[1]] = value;
+  }
+}
+
+loadEnvFile();
 
 // ---------- Configuración (editá esto) ----------
 const HOURS_PER_DAY = 8;
@@ -139,7 +154,7 @@ function printHelp(){
 	
 	console.log("\n=== Flags ===\n")
 	console.log("* node kimai-load.mjs --list | Verificar proyecto y actividades");
-	console.log("* node --env-file=.env kimai-load.mjs {Accion} | Pasar environment como archivo\n");
+	console.log("* El archivo .env se carga automáticamente\n");
 
 }
 async function main() {

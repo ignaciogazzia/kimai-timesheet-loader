@@ -24,25 +24,27 @@ No requiere instalar dependencias: usa el `fetch` nativo de Node.js.
 
 ### Variables de entorno
 
-Definí estas variables antes de ejecutar el script:
+Definí estas variables en un archivo `.env` en la raíz del proyecto:
 
-```bash
-export KIMAI_URL="https://kimai.tuempresa.com"
-export KIMAI_TOKEN="tu-token-de-kimai"
+```dotenv
+KIMAI_URL=https://kimai.tuempresa.com
+KIMAI_TOKEN=tu-token-de-kimai
 ```
+
+El script carga `.env` automáticamente. Las variables definidas en el entorno tienen prioridad sobre las del archivo.
 
 Por defecto, el token se envía como `Authorization: Bearer <token>`. Para instalaciones antiguas que usan `X-AUTH-TOKEN`, agregá:
 
 ```bash
-export KIMAI_LEGACY_HEADER=1
+KIMAI_LEGACY_HEADER=1
 ```
 
 La integración con Jira es opcional. Si se configuran ambas variables, el script consulta el título de cada ticket y lo agrega a la descripción:
 
 ```bash
-export JIRA_EMAIL="tu-email"
-export JIRA_TOKEN="tu-token-de-jira"
-export JIRA_URL="https://tu-instancia.atlassian.net" # opcional
+JIRA_EMAIL=tu-email
+JIRA_TOKEN=tu-token-de-jira
+JIRA_URL=https://tu-instancia.atlassian.net # opcional
 ```
 
 No guardes tokens directamente en el repositorio. Usá variables de entorno o un gestor de secretos.
@@ -123,9 +125,6 @@ Carga las entradas aunque el día ya tenga registros. Usá `--force` con cuidado
 ## Ejemplo completo
 
 ```bash
-export KIMAI_URL="https://kimai.example.com"
-export KIMAI_TOKEN="..."
-
 # Primero revisar la configuración y la salida
 node kimai-load.mjs notas.txt
 
