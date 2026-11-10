@@ -48,28 +48,50 @@ const KIMAI_URL = (process.env.KIMAI_URL || "").replace(/\/$/, "");
 const KIMAI_TOKEN = process.env.KIMAI_TOKEN;
 const LEGACY = process.env.KIMAI_LEGACY_HEADER === "1";
 
-// Opcional: si están definidos JIRA_EMAIL y JIRA_TOKEN, la descripción incluye el título del ticket.
-const JIRA_URL = (process.env.JIRA_URL || "https://jazusoft.atlassian.net").replace(/\/$/, "");
-const JIRA_EMAIL = process.env.JIRA_EMAIL;
-const JIRA_TOKEN = process.env.JIRA_TOKEN;
-const jiraCache = new Map();
+// Opcional: consulta Kaneo vía el endpoint de chat para incluir el título de la tarea.
+const KANEO_CHAT_URL = process.env.KANEO_CHAT_URL || "https://chat.jazusoft.com/api/chat/completions";
+const KANEO_TOKEN = process.env.KANEO_TOKEN;
+const KANEO_MODEL = process.env.KANEO_MODEL || "kaneo";
+const kaneoCache = new Map();
 
-async function ticketDescription(key) {
-  if (!JIRA_EMAIL || !JIRA_TOKEN) return key;
-  if (jiraCache.has(key)) return jiraCache.get(key);
+async function ticketDescription(key, taskUrl = `https://kaneo.jazusoft.com/jazusoft/task/${key}`) {
+  if (!KANEO_TOKEN) return key;
+  if (kaneoCache.has(taskUrl)) return kaneoCache.get(taskUrl);
+
   let desc = key;
   try {
-    const basic = Buffer.from(`${JIRA_EMAIL}:${JIRA_TOKEN}`).toString("base64");
-    const res = await fetch(`${JIRA_URL}/rest/api/3/issue/${key}?fields=summary`, {
-      headers: { Authorization: `Basic ${basic}`, Accept: "application/json" },
+    const res = await fetch(KANEO_CHAT_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${KANEO_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        stream: false,
+        model: KANEO_MODEL,
+        messages: [{
+          role: "user",
+          content: `puedes darme el titulo de esta tarea? Pero SOLO devolver el titulo. Nada mas. ${taskUrl}`,
+        }],
+        features: {
+          image_generation: false,
+          code_interpreter: false,
+          web_search: false,
+        },
+      }),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const summary = (await res.json())?.fields?.summary;
-    if (summary) desc = `${key} ${summary}`;
+
+    const data = await res.json();
+    const content = data?.choices?.[0]?.message?.content;
+    const title = Array.isArray(content)
+      ? content.map((part) => part?.text || "").join("")
+      : content;
+    if (typeof title === "string" && title.trim()) desc = `${key} ${title.trim()}`;
   } catch (e) {
     console.warn(`  (no pude traer el título de ${key}: ${e.message}; uso solo la clave)`);
   }
-  jiraCache.set(key, desc);
+  kaneoCache.set(taskUrl, desc);
   return desc;
 }
 
@@ -100,7 +122,7 @@ async function api(path, opts = {}) {
 
 // "28/09/2026 Lunes" -> fecha; cualquier "XX-123" en las líneas siguientes -> ticket
 function parseNotes(text) {
-  const days = new Map(); // "YYYY-MM-DD" -> ["CP-921", ...]
+  const days = new Map(); // "YYYY-MM-DD" -> [{ key, url }, ...]
   let current = null;
   for (const line of text.split(/\r?\n/)) {
     const d = line.match(/^\s*(\d{1,2})\/(\d{1,2})\/(\d{4})/);
@@ -110,10 +132,12 @@ function parseNotes(text) {
       continue;
     }
     if (!current) continue;
+
+    const url = line.match(/https?:\/\/\S+/)?.[0]?.replace(/[),.;]+$/, "");
     for (const m of line.matchAll(/\b([A-Z]{2,})-(\d+)\b/g)) {
       const key = `${m[1]}-${m[2]}`;
       const list = days.get(current);
-      if (!list.includes(key)) list.push(key);
+      if (!list.some((ticket) => ticket.key === key)) list.push({ key, url });
     }
   }
   return days;
@@ -172,18 +196,18 @@ async function main() {
   for (const [date, tickets] of days) {
     if (tickets.length === 0) continue;
 
-    const unknown = tickets.filter((t) => !PREFIX_MAP[t.split("-")[0]]);
+    const unknown = tickets.filter(({ key }) => !PREFIX_MAP[key.split("-")[0]]);
     if (unknown.length) {
-      console.warn(`[${date}] prefijo desconocido: ${unknown.join(", ")} -> día omitido`);
+      console.warn(`[${date}] prefijo desconocido: ${unknown.map(({ key }) => key).join(", ")} -> día omitido`);
       errors++;
       continue;
     }
     const unset = tickets.filter((t) => {
-      const c = PREFIX_MAP[t.split("-")[0]];
+      const c = PREFIX_MAP[t.key.split("-")[0]];
       return !c.project || !c.activity;
     });
     if (unset.length) {
-      console.warn(`[${date}] faltan IDs de proyecto/actividad en PREFIX_MAP para: ${unset.join(", ")}`);
+      console.warn(`[${date}] faltan IDs de proyecto/actividad en PREFIX_MAP para: ${unset.map(({ key }) => key).join(", ")}`);
       errors++;
       continue;
     }
@@ -203,13 +227,13 @@ async function main() {
 
     for (let i = 0; i < tickets.length; i++) {
       const ticket = tickets[i];
-      const cfg = PREFIX_MAP[ticket.split("-")[0]];
+      const cfg = PREFIX_MAP[ticket.key.split("-")[0]];
       const body = {
         project: cfg.project,
         activity: cfg.activity,
         begin: `${date}T${hms(cursor)}`,
         end: `${date}T${hms(cursor + mins[i])}`,
-        description: await ticketDescription(ticket),
+        description: await ticketDescription(ticket.key, ticket.url),
       };
       cursor += mins[i];
 

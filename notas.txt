@@ -1,19 +1,35 @@
-31/08/2026 Lunes
-	• https://jazusoft.atlassian.net/browse/CP-742
-	• https://jazusoft.atlassian.net/browse/CP-749
+19/10/2026 Lunes
+• https://kaneo.jazusoft.com/jazusoft/task/CP-965/turnos-ajustes-en-seleccin
 
-01/09/2026 Martes
-	• https://jazusoft.atlassian.net/browse/CP-738
-	• https://jazusoft.atlassian.net/browse/CP-749
+20/10/2026 Martes
+	• https://kaneo.jazusoft.com/jazusoft/task/CP-965/turnos-ajustes-en-seleccin
 
-02/09/2026 Miercoles
-	• https://jazusoft.atlassian.net/browse/CP-749
-	• https://jazusoft.atlassian.net/browse/CP-842
 
-03/09/2026 Jueves
-	• https://jazusoft.atlassian.net/browse/CP-749
-	• https://jazusoft.atlassian.net/browse/CP-842
+21/10/2026 Miercoles
+	• https://kaneo.jazusoft.com/jazusoft/task/CP-981/mobile-deteccion-y-correccion-de-bugfix-mensajes
+https://kaneo.jazusoft.com/jazusoft/task/CP-977/fixmobile-pantalla-visualizar-pdf-se-superpone-el-titulo-sob
 
-04/09/2026 Viernes
-	• https://jazusoft.atlassian.net/browse/MC-573
-	• https://jazusoft.atlassian.net/browse/MC-675
+22/10/2026 Jueves
+https://kaneo.jazusoft.com/jazusoft/task/CP-981/mobile-deteccion-y-correccion-de-bugfix-mensajes
+
+23/10/2026 Viernes
+	• https://kaneo.jazusoft.com/jazusoft/task/CP-982/agregar-marca-de-qa-al-icono-de-connect-pacientesaustral-par
+https://kaneo.jazusoft.com/jazusoft/task/CP-983/bugreportado-pepo-en-el-header-de-pdfvisualizer-el-titulo-ta
+
+26/10/2026 Lunes
+	• https://kaneo.jazusoft.com/jazusoft/task/CP-984/ajustes-al-chat-de-ia
+https://kaneo.jazusoft.com/jazusoft/task/CP-985/connect-pacientes-actualizar-a-expo-sdk-58
+
+27/10/2026 Martes
+https://kaneo.jazusoft.com/jazusoft/task/CP-948/rdenes-botn-para-visualizar-pdf-de-la-orden
+
+28/10/2026 Miercoles
+	• https://kaneo.jazusoft.com/jazusoft/task/CP-948/rdenes-botn-para-visualizar-pdf-de-la-orden
+
+29/10/2026 Jueves
+https://kaneo.jazusoft.com/jazusoft/task/CP-979/fix-nps-para-connect-medicos
+
+30/10/2026 Viernes
+	• https://kaneo.jazusoft.com/jazusoft/task/CP-996/subir-app-en-tiendas-google-apple
+	• https://kaneo.jazusoft.com/jazusoft/task/CP-997/subir-app-en-tiendas-google-apple
+https://kaneo.jazusoft.com/jazusoft/task/CP-998/subir-app-en-tiendas-google-apple

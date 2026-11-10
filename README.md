@@ -1,6 +1,6 @@
 # Kimai Load
 
-Script de línea de comandos para cargar horas en [Kimai](https://www.kimai.org/) a partir de notas diarias con tickets de Jira.
+Script de línea de comandos para cargar horas en [Kimai](https://www.kimai.org/) a partir de notas diarias con tareas de Kaneo.
 
 El programa:
 
@@ -9,7 +9,7 @@ El programa:
 - Reparte automáticamente las horas del día entre los tickets encontrados.
 - Genera las entradas consecutivas desde una hora de inicio configurable.
 - Ejecuta un **dry-run por defecto**, por lo que no modifica Kimai salvo que se use `--apply`.
-- Opcionalmente consulta Jira para incluir el título del ticket en la descripción.
+- Opcionalmente consulta Kaneo para incluir el título de la tarea en la descripción.
 
 ## Requisitos
 
@@ -39,13 +39,15 @@ Por defecto, el token se envía como `Authorization: Bearer <token>`. Para insta
 KIMAI_LEGACY_HEADER=1
 ```
 
-La integración con Jira es opcional. Si se configuran ambas variables, el script consulta el título de cada ticket y lo agrega a la descripción:
+La integración con Kaneo es opcional. Si se configura `KANEO_TOKEN`, el script consulta el título de cada tarea mediante el endpoint de chat y lo agrega a la descripción:
 
-```bash
-JIRA_EMAIL=tu-email
-JIRA_TOKEN=tu-token-de-jira
-JIRA_URL=https://tu-instancia.atlassian.net # opcional
+```dotenv
+KANEO_TOKEN=tu-token-de-chat
+KANEO_CHAT_URL=https://chat.jazusoft.com/api/chat/completions # opcional
+KANEO_MODEL=kaneo # opcional
 ```
+
+Si no se configura `KANEO_TOKEN`, la descripción contiene solamente la clave de la tarea.
 
 No guardes tokens directamente en el repositorio. Usá variables de entorno o un gestor de secretos.
 
@@ -78,8 +80,8 @@ Por ejemplo:
 
 ```text
 31/08/2026 Lunes
-  • https://jira.example.com/browse/CP-742
-  • https://jira.example.com/browse/CP-749
+  • https://kaneo.jazusoft.com/jazusoft/task/CP-742/título-de-la-tarea
+  • https://kaneo.jazusoft.com/jazusoft/task/CP-749/otra-tarea
 
 01/09/2026 Martes
   • CP-738
@@ -143,7 +145,7 @@ Con la configuración predeterminada, dos tickets reciben aproximadamente cuatro
 - Un prefijo que no existe en `PREFIX_MAP` hace que se omita el día completo.
 - Si falta el proyecto o la actividad de un prefijo, también se omite el día.
 - Los errores de creación se muestran en pantalla y hacen que el proceso termine con código de salida `1`.
-- Si Jira no responde, se utiliza igualmente la clave del ticket como descripción.
+- Si Kaneo no responde, se utiliza igualmente la clave de la tarea como descripción.
 - El script utiliza estos endpoints de la API de Kimai:
   - `GET /api/projects`
   - `GET /api/activities`
@@ -161,7 +163,7 @@ Con la configuración predeterminada, dos tickets reciben aproximadamente cuatro
 
 ## Seguridad
 
-- Tratá `KIMAI_TOKEN`, `JIRA_TOKEN` y `JIRA_EMAIL` como secretos.
+- Tratá `KIMAI_TOKEN` y `KANEO_TOKEN` como secretos.
 - No los incluyas en `notas.txt`, commits, capturas de pantalla ni logs.
 - Probá siempre primero sin `--apply`.
 - Revisá especialmente la configuración de `PREFIX_MAP` antes de cargar datos en una instancia real.
